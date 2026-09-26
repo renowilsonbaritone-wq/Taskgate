@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: taskgate-sync
+    runtime: python
+    plan: 0.5c-512mb
+    numInstances: 1
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 30 'wsgi:application()'
+    healthCheckPath: /v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.12
+      - key: TASKGATE_DATABASE
+        value: /var/data/taskgate.sqlite3
+      - key: TASKGATE_JOIN_CODE
+        generateValue: true
+    disk:
+      name: taskgate-data
+      mountPath: /var/data
+      sizeGB: 1

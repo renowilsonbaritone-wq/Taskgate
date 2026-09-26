@@ -1,0 +1,27 @@
+services:
+  sync:
+    build: .
+    restart: unless-stopped
+    environment:
+      TASKGATE_JOIN_CODE: ${TASKGATE_JOIN_CODE:?Set a random registration code in .env}
+      TASKGATE_DATABASE: /var/data/taskgate.sqlite3
+    volumes:
+      - taskgate-data:/var/data
+    expose:
+      - "8787"
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      TASKGATE_DOMAIN: ${TASKGATE_DOMAIN:?Set your domain in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+volumes:
+  taskgate-data:
+  caddy-data:
+  caddy-config:
